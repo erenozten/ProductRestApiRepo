@@ -51,7 +51,7 @@ All endpoints return a unified, typed response using `GenericApiResponse<T>`:
   "message": "[200 OK] Successful operation.",
   "data": {
     "id": 1,
-    "name": "Sample City",
+    "name": "Sample Product",
     "about": "Beautiful place."
   }
 }
@@ -65,7 +65,7 @@ Failed responses:
   "statusCode": 404,
   "message": "[404 NotFound] Error! -15- entity not found.",
   "data": null,
-  "errorCode": "CITY_NOTFOUND"
+  "errorCode": "PRODUCT_NOTFOUND"
 }
 ```
 
@@ -84,12 +84,10 @@ Failed responses:
 ```
 /Controllers
     - BaseController.cs
-    - CitiesController.cs
     - ProductsController.cs
 
 /Services
     - ProductService.cs
-    - CityService.cs
 
 /Repositories
     - GenericRepository<T>.cs
@@ -99,7 +97,6 @@ Failed responses:
 /DTOs
     - ProductCreateRequestDto.cs
     - ProductGetResponseDto.cs
-    - CityRequestDto.cs
 
 /Common
     /Responses
