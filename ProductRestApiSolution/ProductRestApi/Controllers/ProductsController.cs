@@ -14,7 +14,6 @@ namespace ProductRestApi.Controllers;
 
 [ApiController]
 [Route("api/v1/Products")]
-//Eğer response tipi GenericApiResponse<T> ise, T ne olursa olsun genelde 500'de data: null olduğu için object kullanmak mantıklı.
 public class ProductsController : BaseController
 {
     private readonly IProductService _productService;
@@ -77,9 +76,6 @@ public class ProductsController : BaseController
     [Tags("Products (Command)")]
     [ProducesResponseType(typeof(GenericApiResponse<object>), StatusCodes.Status409Conflict)]
     [SwaggerResponseExample(StatusCodes.Status409Conflict, typeof(Swagger409Response))]
-    // bu 400BadRequest deprecated olduğu için artık kullanılmıyor. Validation error'lu olanı kullanılıyor artık.
-    // [ProducesResponseType(typeof(GenericApiResponse<object>), StatusCodes.Status400BadRequest)]
-    // [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(Swagger400Response))]
     [ProducesResponseType(typeof(GenericApiResponse<ProductGetResponseDto>), StatusCodes.Status200OK)]
     [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SwaggerGetProduct200Response))]
     [ProducesResponseType(typeof(GenericApiResponse<object>), StatusCodes.Status404NotFound)]
