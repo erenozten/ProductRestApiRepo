@@ -46,11 +46,11 @@ public class ProductService : IProductService
         }
 
         _logger.LogInformation("Ürün başarıyla getirildi: Ürün bilgilieri sağdaki gibidir: {@MyProduct} ", new
-              { MyProductId = product.Id, MyProductName = product.Name, MyProductAbout = product.About  }
+            { MyProductId = product.Id, MyProductName = product.Name, MyProductAbout = product.About }
         );
         return ApiResponseHelper.Success(_mapper.Map<ProductGetResponseDto>(product));
     }
-    
+
     public async Task<GenericApiResponse<ListWithCountDto<ProductGetResponseDto>>> GetProducts()
     {
         var products = await _unitOfWork.ProductRepository.GetAllAsync();
@@ -73,7 +73,8 @@ public class ProductService : IProductService
         if (!isDeleted)
         {
             _logger.LogWarning("{ProductInfo} Ürün bulundu ama silinemedi. ID: {Id}", id);
-            return ApiResponseHelper.Fail<object>(StatusCodes.Status500InternalServerError, ConstMessages.DELETE_FAILED_Description,
+            return ApiResponseHelper.Fail<object>(StatusCodes.Status500InternalServerError,
+                ConstMessages.DELETE_FAILED_Description,
                 ConstMessages.DELETE_FAILED);
         }
 
@@ -150,7 +151,7 @@ public class ProductService : IProductService
 
     public async Task<GenericApiResponse<ProductPatchResponseDto>> PatchProduct(ProductPatchRequestDto dto, int id)
     {
-        if (id == null || id <= 0 )
+        if (id <= 0)
         {
             _logger.LogWarning("Geçersiz ID ile patch request. ID: {Id}", id);
             return ApiResponseHelper.InvalidParameter<ProductPatchResponseDto>();
