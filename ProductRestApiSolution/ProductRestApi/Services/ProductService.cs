@@ -41,7 +41,7 @@ public class ProductService : IProductService
         }
 
         var productLogModel = _mapper.Map<ProductLogModel>(product);
-        _logger.LogInformation("Ürün başarıyla getirildi: Ürün bilgileri sağdaki gibidir: {@ProductLogModel} ", productLogModel);
+        _logger.LogInformation(LoggingTemplates.ProductFound, productLogModel);
         return ApiResponseHelper.Success(_mapper.Map<ProductGetResponseDto>(product));
     }
 
