@@ -1,5 +1,8 @@
 using ProductRestApi.Common.Constants;
 using ProductRestApi.Common.Responses;
+
+namespace ProductRestApi.Middlewares;
+
 public class GlobalExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
@@ -13,12 +16,12 @@ public class GlobalExceptionHandlerMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        _logger.LogInformation( "📥\n ---------------------------------------------------------------- Started Request: {RequestPath}", context.Request.Path);
+        _logger.LogInformation( "📥\n ---------------------------------------------------------------- Started Request: {Path}", context.Request.Path);
 
         try
         {
             await _next(context);
-            _logger.LogInformation( "📥\n ---------------------------------------------------------------- Finished Request: {RequestPath}", context.Request.Path);
+            _logger.LogInformation( "📥\n ---------------------------------------------------------------- Finished Request: {Path}", context.Request.Path);
         }
         catch (Exception ex)
         {
