@@ -107,12 +107,12 @@ public class ProductService : IProductService
         }
 
         bool duplicate = await _unitOfWork.ProductRepository.AnyAsync(x =>
-            x.Id != id && x.Name!.ToLower() == dto.Name.ToLower());
+            x.Id != id && x.Name!.ToLower() == dto.Name!.ToLower());
 
         if (duplicate)
         {
             _logger.LogWarning("Aynı isimde başka bir ürün mevcut. Name: {Name}", dto.Name);
-            return ApiResponseHelper.Duplicate<ProductPutResponseDto>(dto.Name);
+            return ApiResponseHelper.Duplicate<ProductPutResponseDto>(dto.Name!);
         }
 
         _mapper.Map(dto, product);
@@ -134,11 +134,11 @@ public class ProductService : IProductService
             return ApiResponseHelper.ValidationFail<ProductPostResponseDto>(validationResult.Errors);
         }
 
-        bool exists = await _unitOfWork.ProductRepository.AnyAsync(x => x.Name!.ToLower() == dto.Name.ToLower());
+        bool exists = await _unitOfWork.ProductRepository.AnyAsync(x => x.Name!.ToLower() == dto.Name!.ToLower());
         if (exists)
         {
-            _logger.LogWarning("Aynı isimde ürün mevcut. Name: {Name}", dto.Name);
-            return ApiResponseHelper.Duplicate<ProductPostResponseDto>(dto.Name);
+            _logger.LogWarning("Aynı isimde ürün mevcut. Name: {Name}", dto.Name!);
+            return ApiResponseHelper.Duplicate<ProductPostResponseDto>(dto.Name!);
         }
 
         var product = _mapper.Map<Product>(dto);
