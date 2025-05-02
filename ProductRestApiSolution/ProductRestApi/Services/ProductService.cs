@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using ProductRestApi.Common.Constants;
 using ProductRestApi.Common.Extensions;
 using ProductRestApi.Common.Helpers;
+using ProductRestApi.Common.Logging;
 using ProductRestApi.Common.Responses;
 using ProductRestApi.DTOs;
 using ProductRestApi.DTOs.Product;
@@ -33,21 +34,14 @@ public class ProductService : IProductService
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
         if (product == null)
         {
-            _logger.LogWarning("{@MyProduct} Ürün bulunamadı.", new
-                {
-                    Product = new Product()
-                    {
-                        Id = id
-                    }
-                }
+            _logger.LogWarning($"{{@{LoggingMessageTemplate.ProductLogModel}}} Product not found", 
+                new  ProductLogModel  { Id = id } 
             );
-
             return ApiResponseHelper.NotFound<ProductGetResponseDto>(id);
         }
 
-        _logger.LogInformation("Ürün başarıyla getirildi: Ürün bilgilieri sağdaki gibidir: {@MyProduct} ", new
-            { MyProductId = product.Id, MyProductName = product.Name, MyProductAbout = product.About }
-        );
+        var productLogModel = _mapper.Map<ProductLogModel>(product);
+        _logger.LogInformation("Ürün başarıyla getirildi: Ürün bilgileri sağdaki gibidir: {@ProductLogModel} ", productLogModel);
         return ApiResponseHelper.Success(_mapper.Map<ProductGetResponseDto>(product));
     }
 
@@ -65,28 +59,31 @@ public class ProductService : IProductService
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
         if (product == null)
         {
-            _logger.LogWarning("Ürün bulunamadı. ID: {Id}", id);
+            _logger.LogWarning(LoggingTemplates.ProductNotFoundError, new ProductLogModel{Id = id});
             return ApiResponseHelper.NotFound<object>(id);
         }
 
         bool isDeleted = await _unitOfWork.ProductRepository.DeleteAsync(id);
         if (!isDeleted)
         {
-            _logger.LogWarning("{ProductInfo} Ürün bulundu ama silinemedi. ID: {Id}", id);
+            _logger.LogWarning(LoggingTemplates.ProductFoundButDeletionError, new ProductLogModel{Id = id});
             return ApiResponseHelper.Fail<object>(StatusCodes.Status500InternalServerError,
                 ConstMessages.DELETE_FAILED_Description,
                 ConstMessages.DELETE_FAILED);
         }
 
-        _logger.LogInformation("Ürün başarıyla silindi. ID: {Id}", id);
+        var productLogModel = _mapper.Map<ProductLogModel>(product);
+        _logger.LogWarning(LoggingTemplates.ProductDeletedSuccessfully, productLogModel);
         return GenericApiResponse<object>.Success(null, StatusCodes.Status204NoContent);
     }
 
     public async Task<GenericApiResponse<ProductPutResponseDto>> UpdateProduct(ProductPutRequestDto dto, int id)
     {
+        var productLogModel = _mapper.Map<ProductLogModel>(dto);
+
         if (id <= 0)
         {
-            _logger.LogWarning("Geçersiz ID ile update request. ID: {Id}", id);
+            _logger.LogWarning(LoggingTemplates.InvalidIdError, new ProductLogModel{Id = id});
             return ApiResponseHelper.BadRequest<ProductPutResponseDto>();
         }
 
@@ -95,53 +92,57 @@ public class ProductService : IProductService
 
         if (!validationResult.IsValid)
         {
-            _logger.LogWarning("Update request validation hatası.");
+            _logger.LogWarning(LoggingTemplates.ValidationError, productLogModel);
             return ApiResponseHelper.ValidationFail<ProductPutResponseDto>(validationResult.Errors);
         }
 
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
         if (product == null)
         {
-            _logger.LogWarning("Güncellenmek istenen ürün bulunamadı. ID: {Id}", id);
+            _logger.LogWarning(LoggingTemplates.ProductNotFoundError, productLogModel);
             return ApiResponseHelper.NotFound<ProductPutResponseDto>(id);
         }
-
+        
         bool duplicate = await _unitOfWork.ProductRepository.AnyAsync(x =>
             x.Id != id && x.Name!.ToLower() == dto.Name!.ToLower());
 
         if (duplicate)
         {
-            _logger.LogWarning("Aynı isimde başka bir ürün mevcut. Name: {Name}", dto.Name);
+            _logger.LogWarning(LoggingTemplates.ProductNameDuplicateError, productLogModel);
             return ApiResponseHelper.Duplicate<ProductPutResponseDto>(dto.Name!);
         }
 
         _mapper.Map(dto, product);
 
         await _unitOfWork.SaveAsync();
-
-        _logger.LogInformation("Ürün başarıyla güncellendi. ID: {Id}, Name: {Name}", product.Id, product.Name);
+        var productUpdatedLogModel = _mapper.Map<ProductLogModel>(product);
+        _logger.LogWarning(LoggingTemplates.ProductUpdated, productUpdatedLogModel);
         return ApiResponseHelper.Success(_mapper.Map<ProductPutResponseDto>(product));
     }
 
     public async Task<GenericApiResponse<ProductPostResponseDto>> CreateProduct(ProductPostRequestDto dto)
     {
+        var product = _mapper.Map<Product>(dto);
+        var productLogModel = new ProductLogModel();
+        
         var validator = new ProductPostRequestDtoValidator();
         var validationResult = await validator.ValidateAsync(dto);
 
         if (!validationResult.IsValid)
         {
-            _logger.LogWarning("Validation hataları bulundu.");
+            _logger.LogWarning(LoggingTemplates.ValidationError, productLogModel);
             return ApiResponseHelper.ValidationFail<ProductPostResponseDto>(validationResult.Errors);
         }
+        var productUpdatedLogModel = _mapper.Map<ProductLogModel>(product);
 
         bool exists = await _unitOfWork.ProductRepository.AnyAsync(x => x.Name!.ToLower() == dto.Name!.ToLower());
         if (exists)
         {
             _logger.LogWarning("Aynı isimde ürün mevcut. Name: {Name}", dto.Name!);
+            _logger.LogWarning(LoggingTemplates.ProductNameDuplicateError, productUpdatedLogModel);
             return ApiResponseHelper.Duplicate<ProductPostResponseDto>(dto.Name!);
         }
 
-        var product = _mapper.Map<Product>(dto);
         await _unitOfWork.ProductRepository.AddAsync(product);
         await _unitOfWork.SaveAsync();
 
