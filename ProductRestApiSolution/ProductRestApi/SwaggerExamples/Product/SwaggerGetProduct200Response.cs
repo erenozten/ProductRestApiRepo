@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Filters;
 using ProductRestApi.Common.Responses;
-using ProductRestApi.DTOs;
 using ProductRestApi.DTOs.Product;
 
 namespace ProductRestApi.SwaggerExamples.Product
