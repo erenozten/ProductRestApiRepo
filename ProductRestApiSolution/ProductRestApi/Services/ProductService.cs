@@ -125,6 +125,7 @@ public class ProductService : IProductService
         return ApiResponseHelper.Success(_mapper.Map<ProductPutResponseDto>(product));
     }
 
+    // done
     public async Task<GenericApiResponse<ProductPostResponseDto>> CreateProduct(ProductPostRequestDto dto)
     {
         var product = _mapper.Map<Product>(dto);
@@ -155,25 +156,27 @@ public class ProductService : IProductService
 
     public async Task<GenericApiResponse<ProductPatchResponseDto>> PatchProduct(ProductPatchRequestDto dto, int id)
     {
+        var productLogModel = _mapper.Map<ProductLogModel>(dto);
+        productLogModel.Id = id;
+
         if (id <= 0)
         {
-            _logger.LogWarning("Geçersiz ID ile patch request. ID: {Id}", id);
-            return ApiResponseHelper.InvalidParameter<ProductPatchResponseDto>();
-            // return BadRequest<ProductPatchResponseDto>();
+            _logger.LogWarning(LoggingTemplates.InvalidIdError, new ProductLogModel { Id = id });
+            return ApiResponseHelper.BadRequest<ProductPatchResponseDto>();
         }
 
         var validator = new ProductPatchRequestDtoValidator();
         var validationResult = await validator.ValidateAsync(dto);
         if (!validationResult.IsValid)
         {
-            _logger.LogWarning("Patch request validation hatası.");
+            _logger.LogWarning(LoggingTemplates.ValidationError, productLogModel);
             return ApiResponseHelper.ValidationFail<ProductPatchResponseDto>(validationResult.Errors);
         }
 
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
         if (product == null)
         {
-            _logger.LogWarning("Patch yapılmak istenen ürün bulunamadı. ID: {Id}", id);
+            _logger.LogWarning(LoggingTemplates.ProductNotFoundError, productLogModel);
             return ApiResponseHelper.NotFound<ProductPatchResponseDto>(id);
         }
 
@@ -184,7 +187,7 @@ public class ProductService : IProductService
 
             if (duplicate)
             {
-                _logger.LogWarning("Patch işleminde çakışan isim bulundu. Name: {Name}", dto.Name);
+                _logger.LogWarning(LoggingTemplates.ProductNameDuplicateError, productLogModel);
                 return ApiResponseHelper.Duplicate<ProductPatchResponseDto>(dto.Name);
             }
         }
@@ -192,7 +195,7 @@ public class ProductService : IProductService
         _mapper.Map(dto, product);
         await _unitOfWork.SaveAsync();
 
-        _logger.LogInformation("Ürün başarıyla patch'lendi. ID: {Id}, Name: {Name}", product.Id, product.Name);
+        _logger.LogInformation(LoggingTemplates.ProductPatched, productLogModel);
         return ApiResponseHelper.Success(_mapper.Map<ProductPatchResponseDto>(product));
     }
 }

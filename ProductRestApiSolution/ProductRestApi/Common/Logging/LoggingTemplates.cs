@@ -11,6 +11,5 @@ public static class LoggingTemplates
     public const string ProductFoundButDeletionError = $"{{@{LoggingMessageTemplate.ProductLogModel}}} Product found but an error occurred during deletion.";
     public const string ProductsFound = $"{{@{LoggingMessageTemplate.ProductLogModel}}} Products found.";
     public const string ProductCreatedSuccessfully = $"{{@{LoggingMessageTemplate.ProductLogModel}}} Ürün başarıyla oluşturuldu.";
-    
-    
+    public static readonly string ProductPatched = $"{{@{LoggingMessageTemplate.ProductLogModel}}} Ürün başarıyla patch'lendi.";
 }
