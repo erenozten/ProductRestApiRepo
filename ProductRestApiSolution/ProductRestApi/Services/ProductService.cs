@@ -128,8 +128,8 @@ public class ProductService : IProductService
     public async Task<GenericApiResponse<ProductPostResponseDto>> CreateProduct(ProductPostRequestDto dto)
     {
         var product = _mapper.Map<Product>(dto);
-        var productLogModel = new ProductLogModel();
-        
+        var productLogModel = _mapper.Map<ProductLogModel>(dto);
+
         var validator = new ProductPostRequestDtoValidator();
         var validationResult = await validator.ValidateAsync(dto);
 
@@ -138,20 +138,18 @@ public class ProductService : IProductService
             _logger.LogWarning(LoggingTemplates.ValidationError, productLogModel);
             return ApiResponseHelper.ValidationFail<ProductPostResponseDto>(validationResult.Errors);
         }
-        var productUpdatedLogModel = _mapper.Map<ProductLogModel>(product);
 
         bool exists = await _unitOfWork.ProductRepository.AnyAsync(x => x.Name!.ToLower() == dto.Name!.ToLower());
         if (exists)
         {
-            _logger.LogWarning("Aynı isimde ürün mevcut. Name: {Name}", dto.Name!);
-            _logger.LogWarning(LoggingTemplates.ProductNameDuplicateError, productUpdatedLogModel);
+            _logger.LogWarning(LoggingTemplates.ProductNameDuplicateError, productLogModel);
             return ApiResponseHelper.Duplicate<ProductPostResponseDto>(dto.Name!);
         }
 
         await _unitOfWork.ProductRepository.AddAsync(product);
         await _unitOfWork.SaveAsync();
 
-        _logger.LogInformation("Yeni ürün oluşturuldu. ID: {Id}, Name: {Name}", product.Id, product.Name);
+        _logger.LogInformation(LoggingTemplates.ProductCreatedSuccessfully, _mapper.Map<ProductLogModel>(product));
         return ApiResponseHelper.Success(_mapper.Map<ProductPostResponseDto>(product));
     }
 
