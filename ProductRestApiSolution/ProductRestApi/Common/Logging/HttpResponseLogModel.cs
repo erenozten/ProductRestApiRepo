@@ -1,3 +1,5 @@
+using ProductRestApi.Interfaces;
+
 namespace ProductRestApi.Common.Logging;
 
 public class HttpResponseLogModel
