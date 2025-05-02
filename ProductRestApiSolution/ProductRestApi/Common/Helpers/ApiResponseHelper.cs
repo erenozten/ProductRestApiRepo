@@ -6,7 +6,7 @@ using ProductRestApi.DTOs;
 
 namespace ProductRestApi.Common.Helpers;
 
-public class ApiResponseHelper
+public static class ApiResponseHelper
 {
     public static GenericApiResponse<ListWithCountDto<T>> SuccessList<T>(List<T> items) =>
         GenericApiResponse<ListWithCountDto<T>>.SuccessList(items);
