@@ -1,3 +1,4 @@
+using ProductRestApi.Common.Constants;
 using ProductRestApi.Common.Responses;
 public class GlobalExceptionHandlerMiddleware
 {
@@ -31,7 +32,7 @@ public class GlobalExceptionHandlerMiddleware
                 null,
                 StatusCodes.Status500InternalServerError,
                 "Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.",
-                "INTERNAL_SERVER_ERROR"
+                ConstMessages.INTERNAL_SERVER_ERROR_Description
             );
 
             await context.Response.WriteAsJsonAsync(response);
