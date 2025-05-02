@@ -55,22 +55,24 @@ public class ProductService : IProductService
         return ApiResponseHelper.SuccessList(productsDto);
     }
 
+    // done
     public async Task<GenericApiResponse<object>> DeleteProduct(int id)
     {
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
-        var productLogModel = _mapper.Map<ProductLogModel>(product);
-        
         if (product == null)
         {
-            _logger.LogWarning(LoggingTemplates.ProductNotFoundError, productLogModel);
+            _logger.LogWarning(LoggingTemplates.ProductNotFoundError, new ProductLogModel { Id = id });
             return ApiResponseHelper.NotFound<object>(id);
         }
+
+        var productLogModel = _mapper.Map<ProductLogModel>(product);
 
         bool isDeleted = await _unitOfWork.ProductRepository.DeleteAsync(id);
         if (!isDeleted)
         {
             _logger.LogWarning(LoggingTemplates.ProductFoundButDeletionError, productLogModel);
-            return ApiResponseHelper.Fail<object>(StatusCodes.Status500InternalServerError,
+            return ApiResponseHelper.Fail<object>(
+                StatusCodes.Status500InternalServerError,
                 ConstMessages.DELETE_FAILED_Description,
                 ConstMessages.DELETE_FAILED);
         }
