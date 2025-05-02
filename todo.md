@@ -1,21 +1,41 @@
-## ✅ Add ModelState.IsValid for FluentValidation
+#### ✅ Add ModelState.IsValid for FluentValidation
 
-## ✅ AMake all logs structured → run logging queries in SEQ and see results
+####
 
-## ✅ ACreate service for logging → \_logger.LogWarning("Aynı isimde başka bir ürün mevcut. Name: {Name}", dto.Name);
+#### ✅ Make all logs structured → run logging queries in SEQ and see results
 
-## ✅ AAdd unit tests
+####
 
-## ✅ AAdd .NET Identity
+#### ✅ Create service for logging → \_logger.LogWarning("Aynı isimde başka bir ürün mevcut. Name: {Name}", dto.Name);
 
-## ✅ AAdd Strategy Pattern for logging while injecting logger (e.g., logging to SEQ or local)
+####
 
-## ✅ Health Check endpoint
+#### ✅ Add unit tests
 
-## ✅ Serilog + SEQ logging demonstration
+####
 
-## ✅ Response caching with Redis
+#### ✅ Add .NET Identity
 
-## ✅ Rate Limiting (AspNetCoreRateLimit)
+####
 
-## ✅ Integration Testing (FluentAssertions, WebApplicationFactory)
+#### ✅ Add Strategy Pattern for logging while injecting logger (e.g., logging to SEQ or local)
+
+####
+
+#### ✅ Add Health Check endpoint
+
+####
+
+#### ✅ Add Serilog + SEQ logging demonstration
+
+####
+
+#### ✅ Add Response caching with Redis
+
+####
+
+#### ✅ Add Rate Limiting (AspNetCoreRateLimit)
+
+####
+
+#### ✅ Add Integration Testing (FluentAssertions, WebApplicationFactory)
