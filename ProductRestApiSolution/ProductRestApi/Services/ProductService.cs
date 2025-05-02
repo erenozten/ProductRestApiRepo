@@ -48,38 +48,42 @@ public class ProductService : IProductService
     public async Task<GenericApiResponse<ListWithCountDto<ProductGetResponseDto>>> GetProducts()
     {
         var products = await _unitOfWork.ProductRepository.GetAllAsync();
-        var dtoList = _mapper.Map<List<ProductGetResponseDto>>(products);
+        var productsDto = _mapper.Map<List<ProductGetResponseDto>>(products);
+        var productsLogModel = _mapper.Map<List<ProductLogModel>>(productsDto);
 
-        _logger.LogInformation("Toplam {Count} ürün getirildi.", dtoList.Count);
-        return ApiResponseHelper.SuccessList(dtoList);
+        _logger.LogInformation(LoggingTemplates.ProductsFound, productsLogModel);
+        return ApiResponseHelper.SuccessList(productsDto);
     }
 
     public async Task<GenericApiResponse<object>> DeleteProduct(int id)
     {
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
+        var productLogModel = _mapper.Map<ProductLogModel>(product);
+        
         if (product == null)
         {
-            _logger.LogWarning(LoggingTemplates.ProductNotFoundError, new ProductLogModel{Id = id});
+            _logger.LogWarning(LoggingTemplates.ProductNotFoundError, productLogModel);
             return ApiResponseHelper.NotFound<object>(id);
         }
 
         bool isDeleted = await _unitOfWork.ProductRepository.DeleteAsync(id);
         if (!isDeleted)
         {
-            _logger.LogWarning(LoggingTemplates.ProductFoundButDeletionError, new ProductLogModel{Id = id});
+            _logger.LogWarning(LoggingTemplates.ProductFoundButDeletionError, productLogModel);
             return ApiResponseHelper.Fail<object>(StatusCodes.Status500InternalServerError,
                 ConstMessages.DELETE_FAILED_Description,
                 ConstMessages.DELETE_FAILED);
         }
 
-        var productLogModel = _mapper.Map<ProductLogModel>(product);
-        _logger.LogWarning(LoggingTemplates.ProductDeletedSuccessfully, productLogModel);
+        _logger.LogInformation(LoggingTemplates.ProductDeletedSuccessfully, productLogModel);
         return GenericApiResponse<object>.Success(null, StatusCodes.Status204NoContent);
     }
 
+    // done
     public async Task<GenericApiResponse<ProductPutResponseDto>> UpdateProduct(ProductPutRequestDto dto, int id)
     {
         var productLogModel = _mapper.Map<ProductLogModel>(dto);
+        productLogModel.Id = id;
 
         if (id <= 0)
         {
@@ -113,10 +117,9 @@ public class ProductService : IProductService
         }
 
         _mapper.Map(dto, product);
-
         await _unitOfWork.SaveAsync();
-        var productUpdatedLogModel = _mapper.Map<ProductLogModel>(product);
-        _logger.LogWarning(LoggingTemplates.ProductUpdated, productUpdatedLogModel);
+        
+        _logger.LogInformation(LoggingTemplates.ProductUpdated, productLogModel);
         return ApiResponseHelper.Success(_mapper.Map<ProductPutResponseDto>(product));
     }
 
