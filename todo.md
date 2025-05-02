@@ -1,3 +1,3 @@
-\*\*add ModelState.Isvalid for fluent validation
+##Add ModelState.Isvalid for fluent validation
 
-\*\*make all logs structured -> run logging queries in SEQ and see results
+##Make all logs structured -> run logging queries in SEQ and see results
