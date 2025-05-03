@@ -1,3 +1,4 @@
+using ProductRestApi.Common.Constants;
 using ProductRestApi.Common.Logging;
 
 namespace ProductRestApi.Middlewares;
@@ -20,6 +21,9 @@ public class RequestResponseLoggingMiddleware
 
     public async Task Invoke(HttpContext context)
     {
+        _logger.LogInformation(ConstMessages.LogStartFinishDash + "xcvkyhvgkt");
+        _logger.LogInformation($"Started Request. uj5ggcac");
+        
         context.Request.EnableBuffering(); 
         var requestBody = await ReadRequestBody(context.Request);
 
@@ -62,6 +66,8 @@ public class RequestResponseLoggingMiddleware
         await responseBody.CopyToAsync(originalBodyStream); 
 
         context.Response.Body = originalBodyStream; 
+        _logger.LogInformation($"Finished Request successfully. swread");
+        _logger.LogInformation(ConstMessages.LogStartFinishDash + "tretgdf");
     }
 
 

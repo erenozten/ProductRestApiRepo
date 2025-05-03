@@ -45,5 +45,7 @@ namespace ProductRestApi.Common.Constants
         public static string Product_Name_EmptyError => "Product name cannot be empty.";
         public static string Product_Name_MaxLengthError => "Product name is too long.";
         public static string Product_About_MaxLengthError => "Product about is too long.";
+        
+        public static string LogStartFinishDash => "------------------------------------------------------------------------";
     }
 }
