@@ -1,8 +1,6 @@
 using AutoMapper;
 using FluentValidation;
-using FluentValidation.Results;
 using ProductRestApi.Common.Constants;
-using ProductRestApi.Common.Extensions;
 using ProductRestApi.Common.Helpers;
 using ProductRestApi.Common.Logging;
 using ProductRestApi.Common.Responses;
@@ -10,7 +8,6 @@ using ProductRestApi.DTOs;
 using ProductRestApi.DTOs.Product;
 using ProductRestApi.Entities;
 using ProductRestApi.Interfaces.Repositories;
-using ProductRestApi.Validators;
 
 namespace ProductRestApi.Services;
 
