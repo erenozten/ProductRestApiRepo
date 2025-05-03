@@ -34,7 +34,7 @@ public class GlobalExceptionHandlerMiddleware
             var response = GenericApiResponse<object>.Fail(
                 null,
                 StatusCodes.Status500InternalServerError,
-                "Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.",
+                ex.Message,
                 ConstMessages.INTERNAL_SERVER_ERROR_Description
             );
 
