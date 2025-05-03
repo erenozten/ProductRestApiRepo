@@ -11,8 +11,14 @@ public static class ApiResponseHelper
     public static GenericApiResponse<ListWithCountDto<T>> SuccessList<T>(List<T> items) =>
         GenericApiResponse<ListWithCountDto<T>>.SuccessList(items);
 
+    /// <summary>
+    /// returns Status 200
+    /// </summary>
     public static GenericApiResponse<T> Success<T>(T data) =>
         GenericApiResponse<T>.Success(data, StatusCodes.Status200OK);
+
+    public static GenericApiResponse<T> SuccessWith204<T>() =>
+        GenericApiResponse<T>.Success(default, StatusCodes.Status204NoContent);
 
     public static GenericApiResponse<T> InternalError<T>() =>
         GenericApiResponse<T>.Fail(default, StatusCodes.Status500InternalServerError,

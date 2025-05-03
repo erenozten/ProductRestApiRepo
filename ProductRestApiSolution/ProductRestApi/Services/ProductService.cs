@@ -42,8 +42,7 @@ public class ProductService : IProductService
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
         if (product == null)
         {
-            _logger.LogWarning($"{{@{LoggingMessageTemplate.ProductLogModel}}} Product not found", 
-                new ProductLogModel { Id = id });
+            _logger.LogWarning($"{{@{LoggingMessageTemplate.ProductLogModel}}} Product not found", new ProductLogModel { Id = id });
             return ApiResponseHelper.NotFound<ProductGetResponseDto>(id);
         }
 
@@ -62,6 +61,7 @@ public class ProductService : IProductService
         return ApiResponseHelper.SuccessList(productsDto);
     }
 
+    // public async Task<GenericApiResponse<object>> DeleteProduct(int id)
     public async Task<GenericApiResponse<object>> DeleteProduct(int id)
     {
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
@@ -84,7 +84,7 @@ public class ProductService : IProductService
         }
 
         _logger.LogInformation(LoggingTemplates.ProductDeletedSuccessfully, productLogModel);
-        return GenericApiResponse<object>.Success(null, StatusCodes.Status204NoContent);
+        return ApiResponseHelper.SuccessWith204<object>();
     }
 
     public async Task<GenericApiResponse<ProductPutResponseDto>> UpdateProduct(ProductPutRequestDto dto, int id)
