@@ -37,3 +37,5 @@
 #### ✅ Add Rate Limiting (AspNetCoreRateLimit)
 
 #### ✅ Add Integration Testing (FluentAssertions, WebApplicationFactory)
+
+#### ✅ app.UseIpRateLimiting(); // dışarıdan gelen flood'ı kesmek için app.UseClientRateLimiting(); // kullanıcı bazlı koruma için
