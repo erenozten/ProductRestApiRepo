@@ -77,10 +77,7 @@ public class ProductService : IProductService
         if (!isDeleted)
         {
             _logger.LogWarning(LoggingTemplates.ProductFoundButDeletionError, productLogModel);
-            return ApiResponseHelper.Fail<object>(
-                StatusCodes.Status500InternalServerError,
-                ConstMessages.DELETE_FAILED_Description,
-                ConstMessages.DELETE_FAILED);
+            return ApiResponseHelper.InternalError<object>();
         }
 
         _logger.LogInformation(LoggingTemplates.ProductDeletedSuccessfully, productLogModel);
