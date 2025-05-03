@@ -1,9 +1,9 @@
 namespace ProductRestApi.Common.Constants
 {
-    public class ConstMessages
+    public static class ConstMessages
     {
-        public const string Success = "Success.";
-        public const string Fail = "Error!";
+        public static string Success = "Success.";
+        public static string Fail = "Error!";
 
         public static string NotFound404Generic(int id) => $"No record found with ID -{id}-.";
         public static string ProductAddedSuccessfully => "Product added successfully.";
