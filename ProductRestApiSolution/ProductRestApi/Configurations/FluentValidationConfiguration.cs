@@ -1,6 +1,5 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using ProductRestApi.Validators;
 
 namespace ProductRestApi.Configurations;
 
@@ -11,8 +10,7 @@ public static class FluentValidationConfiguration
         services.AddFluentValidationAutoValidation();
         services.AddFluentValidationClientsideAdapters();
 
-        // Assembly taraması
-        services.AddValidatorsFromAssemblyContaining<Program>();
-        services.AddValidatorsFromAssemblyContaining<ProductPostRequestDtoValidator>();
+        services.AddValidatorsFromAssemblyContaining<Program>();                             // Assembly taraması: Bu satır sayesinde, Program.cs dosyasının bulunduğu assembly taranır. Eğer tüm validator sınıfların bu projede yer alıyorsa, bu satır genelde yeterlidir.
+        // services.AddValidatorsFromAssemblyContaining<ProductPostRequestDtoValidator>();
     }
 }
