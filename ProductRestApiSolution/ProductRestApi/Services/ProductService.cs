@@ -1,4 +1,5 @@
 using AutoMapper;
+using FluentValidation;
 using FluentValidation.Results;
 using ProductRestApi.Common.Constants;
 using ProductRestApi.Common.Extensions;
@@ -19,14 +20,24 @@ public class ProductService : IProductService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ProductService> _logger;
 
+    private readonly IValidator<ProductPostRequestDto> _postValidator;
+    private readonly IValidator<ProductPutRequestDto> _putValidator;
+    private readonly IValidator<ProductPatchRequestDto> _patchValidator;
+
     public ProductService(
         IMapper mapper,
         IUnitOfWork unitOfWork,
-        ILogger<ProductService> logger)
+        ILogger<ProductService> logger,
+        IValidator<ProductPostRequestDto> postValidator,
+        IValidator<ProductPutRequestDto> putValidator,
+        IValidator<ProductPatchRequestDto> patchValidator)
     {
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _postValidator = postValidator;
+        _putValidator = putValidator;
+        _patchValidator = patchValidator;
     }
 
     public async Task<GenericApiResponse<ProductGetResponseDto>> GetProduct(int id)
@@ -35,8 +46,7 @@ public class ProductService : IProductService
         if (product == null)
         {
             _logger.LogWarning($"{{@{LoggingMessageTemplate.ProductLogModel}}} Product not found", 
-                new  ProductLogModel  { Id = id } 
-            );
+                new ProductLogModel { Id = id });
             return ApiResponseHelper.NotFound<ProductGetResponseDto>(id);
         }
 
@@ -55,7 +65,6 @@ public class ProductService : IProductService
         return ApiResponseHelper.SuccessList(productsDto);
     }
 
-    // done
     public async Task<GenericApiResponse<object>> DeleteProduct(int id)
     {
         var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
@@ -81,7 +90,6 @@ public class ProductService : IProductService
         return GenericApiResponse<object>.Success(null, StatusCodes.Status204NoContent);
     }
 
-    // done
     public async Task<GenericApiResponse<ProductPutResponseDto>> UpdateProduct(ProductPutRequestDto dto, int id)
     {
         var productLogModel = _mapper.Map<ProductLogModel>(dto);
@@ -89,13 +97,11 @@ public class ProductService : IProductService
 
         if (id <= 0)
         {
-            _logger.LogWarning(LoggingTemplates.InvalidIdError, new ProductLogModel{Id = id});
+            _logger.LogWarning(LoggingTemplates.InvalidIdError, new ProductLogModel { Id = id });
             return ApiResponseHelper.BadRequest<ProductPutResponseDto>();
         }
 
-        var validator = new ProductPutRequestDtoValidator();
-        var validationResult = await validator.ValidateAsync(dto);
-
+        var validationResult = await _putValidator.ValidateAsync(dto);
         if (!validationResult.IsValid)
         {
             _logger.LogWarning(LoggingTemplates.ValidationError, productLogModel);
@@ -108,7 +114,7 @@ public class ProductService : IProductService
             _logger.LogWarning(LoggingTemplates.ProductNotFoundError, productLogModel);
             return ApiResponseHelper.NotFound<ProductPutResponseDto>(id);
         }
-        
+
         bool duplicate = await _unitOfWork.ProductRepository.AnyAsync(x =>
             x.Id != id && x.Name!.ToLower() == dto.Name!.ToLower());
 
@@ -120,20 +126,17 @@ public class ProductService : IProductService
 
         _mapper.Map(dto, product);
         await _unitOfWork.SaveAsync();
-        
+
         _logger.LogInformation(LoggingTemplates.ProductUpdated, productLogModel);
         return ApiResponseHelper.Success(_mapper.Map<ProductPutResponseDto>(product));
     }
 
-    // done
     public async Task<GenericApiResponse<ProductPostResponseDto>> CreateProduct(ProductPostRequestDto dto)
     {
         var product = _mapper.Map<Product>(dto);
         var productLogModel = _mapper.Map<ProductLogModel>(dto);
 
-        var validator = new ProductPostRequestDtoValidator();
-        var validationResult = await validator.ValidateAsync(dto);
-
+        var validationResult = await _postValidator.ValidateAsync(dto);
         if (!validationResult.IsValid)
         {
             _logger.LogWarning(LoggingTemplates.ValidationError, productLogModel);
@@ -165,8 +168,7 @@ public class ProductService : IProductService
             return ApiResponseHelper.BadRequest<ProductPatchResponseDto>();
         }
 
-        var validator = new ProductPatchRequestDtoValidator();
-        var validationResult = await validator.ValidateAsync(dto);
+        var validationResult = await _patchValidator.ValidateAsync(dto);
         if (!validationResult.IsValid)
         {
             _logger.LogWarning(LoggingTemplates.ValidationError, productLogModel);
